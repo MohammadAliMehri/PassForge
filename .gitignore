@@ -1,0 +1,12 @@
+# Ignore Claude Code session files
+.claude/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Editor junk
+.vscode/
+.idea/
+*.swp
+*.swo

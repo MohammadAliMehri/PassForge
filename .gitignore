@@ -1,6 +1,3 @@
-# Ignore Claude Code session files
-.claude/
-
 # OS junk
 .DS_Store
 Thumbs.db

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="PassForge — analyze your password strength and generate strong random passwords. 100% offline: every check happens locally in your browser." />
+  <meta name="color-scheme" content="dark" />
+  <meta name="theme-color" content="#0a1120" />
+  <title>PassForge — Password Strength Analyzer &amp; Generator</title>
+
+  <!-- Emoji favicon (SVG data URI, no external request) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔒</text></svg>" />
+
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip-link" href="#analyzer">Skip to analyzer</a>
+
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">🛡️</span>
+      <div>
+        <h1>Pass<span>Forge</span></h1>
+        <p class="tagline">Password Strength Analyzer &amp; Strong Password Generator</p>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+    <!-- ===================== ANALYZER ===================== -->
+    <section class="card" id="analyzer" aria-labelledby="analyzer-heading">
+      <h2 id="analyzer-heading"><span aria-hidden="true">🔍</span> Password Analyzer</h2>
+      <p class="card-hint">Type or paste a password below. Nothing ever leaves this page.</p>
+
+      <div class="input-row">
+        <label class="sr-only" for="password-input">Password to analyze</label>
+        <div class="password-field">
+          <input
+            type="password"
+            id="password-input"
+            name="password"
+            placeholder="Enter a password to analyze…"
+            autocomplete="off"
+            autocapitalize="off"
+            spellcheck="false"
+            enterkeyhint="done"
+          />
+          <button type="button" id="toggle-visibility" class="icon-btn" aria-label="Show password" aria-pressed="false">
+            <span class="eye-open" aria-hidden="true">👁️</span>
+            <span class="eye-closed" aria-hidden="true" hidden>🙈</span>
+          </button>
+          <button type="button" id="clear-password" class="icon-btn" aria-label="Clear password">
+            <span aria-hidden="true">✕</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Strength meter -->
+      <div class="strength-block">
+        <div class="strength-meta">
+          <span id="strength-label" class="strength-label">Waiting for input…</span>
+          <span id="strength-score" class="strength-score">0 / 100</span>
+        </div>
+        <div
+          class="meter"
+          id="strength-meter-track"
+          role="progressbar"
+          aria-valuemin="0"
+          aria-valuemax="100"
+          aria-valuenow="0"
+          aria-labelledby="strength-label"
+        >
+          <div class="meter-fill" id="strength-meter-fill"></div>
+        </div>
+
+        <dl class="stat-chips" aria-label="Password statistics">
+          <div class="chip"><dt>Length</dt><dd id="stat-length">0</dd></div>
+          <div class="chip"><dt>Entropy</dt><dd><span id="stat-entropy">0</span> bits</dd></div>
+          <div class="chip"><dt>Char types</dt><dd id="stat-classes">0 / 4</dd></div>
+        </dl>
+      </div>
+
+      <!-- Requirement checklist -->
+      <ul class="checklist" id="checklist" aria-label="Password requirements">
+        <li id="check-length" data-state="neutral"><span class="tick" aria-hidden="true"></span>12+ characters</li>
+        <li id="check-lower"   data-state="neutral"><span class="tick" aria-hidden="true"></span>Lowercase letter</li>
+        <li id="check-upper"   data-state="neutral"><span class="tick" aria-hidden="true"></span>Uppercase letter</li>
+        <li id="check-number"  data-state="neutral"><span class="tick" aria-hidden="true"></span>Number</li>
+        <li id="check-symbol"  data-state="neutral"><span class="tick" aria-hidden="true"></span>Symbol</li>
+        <li id="check-common"  data-state="neutral"><span class="tick" aria-hidden="true"></span>Not a common password</li>
+        <li id="check-seq"     data-state="neutral"><span class="tick" aria-hidden="true"></span>No sequential characters</li>
+        <li id="check-repeat"  data-state="neutral"><span class="tick" aria-hidden="true"></span>No repeated characters</li>
+      </ul>
+
+      <!-- Live feedback -->
+      <div class="feedback">
+        <h3>Suggestions</h3>
+        <ul id="feedback-list" aria-live="polite"></ul>
+      </div>
+
+      <p class="privacy-note">
+        <span aria-hidden="true">🔐</span>
+        This page has no backend. Your password is analyzed entirely in your browser and is never stored, logged, or transmitted.
+      </p>
+    </section>
+
+    <!-- ===================== GENERATOR ===================== -->
+    <section class="card" id="generator" aria-labelledby="generator-heading">
+      <h2 id="generator-heading"><span aria-hidden="true">⚙️</span> Password Generator</h2>
+      <p class="card-hint">Forged locally with cryptographically secure randomness (<code>crypto.getRandomValues</code>).</p>
+
+      <!-- Output -->
+      <div class="input-row">
+        <label class="sr-only" for="generated-output">Generated password</label>
+        <div class="password-field">
+          <input
+            type="text"
+            id="generated-output"
+            readonly
+            placeholder="Click “Generate Password”…"
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <button type="button" id="copy-password" class="icon-btn" aria-label="Copy generated password">
+            <span aria-hidden="true">📋</span>
+          </button>
+        </div>
+        <p id="copy-status" class="copy-status" role="status" aria-live="polite"></p>
+      </div>
+
+      <div class="btn-row">
+        <button type="button" id="generate-btn" class="btn btn-primary">
+          <span aria-hidden="true">⚡</span> Generate Password
+        </button>
+        <button type="button" id="regenerate-btn" class="btn btn-secondary" disabled>
+          <span aria-hidden="true">🔄</span> Regenerate
+        </button>
+        <button type="button" id="use-password-btn" class="btn btn-secondary" disabled>
+          <span aria-hidden="true">🧪</span> Use this password
+        </button>
+      </div>
+
+      <!-- Options -->
+      <fieldset class="options">
+        <legend>Options</legend>
+
+        <div class="option-row length-row">
+          <label for="length-slider">Length: <output id="length-value" for="length-slider">16</output></label>
+          <input
+            type="range"
+            id="length-slider"
+            min="8"
+            max="64"
+            step="1"
+            value="16"
+            aria-describedby="length-value"
+          />
+        </div>
+
+        <div class="checkbox-grid">
+          <label class="checkbox">
+            <input type="checkbox" id="opt-lower" checked />
+            <span>Lowercase <code>a–z</code></span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="opt-upper" checked />
+            <span>Uppercase <code>A–Z</code></span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="opt-number" checked />
+            <span>Numbers <code>0–9</code></span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" id="opt-symbol" checked />
+            <span>Symbols <code>!@#$…</code></span>
+          </label>
+          <label class="checkbox checkbox-wide">
+            <input type="checkbox" id="opt-exclude-ambiguous" />
+            <span>Exclude look-alikes <code>0&nbsp;O&nbsp;o&nbsp;l&nbsp;I&nbsp;1</code></span>
+          </label>
+        </div>
+
+        <p id="generator-error" class="generator-error" hidden role="alert"></p>
+      </fieldset>
+
+      <p class="privacy-note">
+        <span aria-hidden="true">🎲</span>
+        Generated passwords are produced on your device with the Web Crypto API and are never sent anywhere.
+      </p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>All checks happen locally in your browser. Passwords are never sent anywhere.</p>
+    <p class="footer-sub">PassForge · static site · zero tracking · view source to verify</p>
+  </footer>
+
+  <!-- Toast for copy confirmation -->
+  <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

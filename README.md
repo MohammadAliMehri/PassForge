@@ -2,6 +2,10 @@
 
 A privacy-first, frontend-only web app that analyzes password strength in real-time and generates cryptographically strong random passwords entirely in your browser.
 
+**Live demo:** https://mohammadalimehri.github.io/PassForge/
+
+![PassForge screenshot](screenshot.png)
+
 ## Features
 
 - **Live password analysis** with strength score (0–100) and color-coded progress bar
